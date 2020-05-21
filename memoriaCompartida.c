@@ -8,10 +8,13 @@
 int main()
 {
     pid_t pid;
-    key_t key = 8989;
+    key_t key = 8978;
     int shmId;
-    long long a, b, c, *ap;
-    int status, cpid, r, i, tope = 12500, contador = 0;
+    long long a, b, c, *ap, *vector;
+    int status, cpid, r, i, tope = 12500000, contador = 0;
+    vector = (long long *)malloc(tope * sizeof(long long));
+    for(i = 0; i < tope; i++)
+        vector[i] = rand();
     //crear espacio de memoria compartida
     shmId = shmget(key, tope * sizeof(long long), 0666 | IPC_CREAT);
     if(shmId < 0){
@@ -26,16 +29,15 @@ int main()
         exit(EXIT_FAILURE); 
     }
     if(pid == 0) //hijo
-        for(i = 0; i < tope; i++)
-            *(ap + i) = rand();
+        //for(i = 0; i < tope; i++)
+            *ap = *vector;
     else{ //padre
         if (wait(&status) == pid){ //esperar a hijo
-            for(i = 0; i < tope; i++){
+            //for(i = 0; i < tope; i++)
                 //printf("\ndato %lli", *(ap + i));
-                contador++;
-            }   
+              //  contador++;
+            //}   
         }
-        printf("Se leyeron %i datos.\n%i * 8 bytes = %i bytes.\n", contador, contador, (contador * 8));
     }
     r = shmdt(ap);  //desasociar espacio de memoria compartida
     if(r < 0){
